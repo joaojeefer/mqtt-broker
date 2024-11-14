@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id       Int      @id @default(autoincrement()) @map("evento_id")
+  dateTime DateTime @map("data_hora")
+  value    String   @map("valor")
+  sensorId Int      @map("sensor_id")
+  sensor   Sensor   @relation(fields: [sensorId], references: [id])
+
+  @@map("Eventos")
+}
+
+model Sensor {
+  id          Int     @id @default(autoincrement()) @map("sensor_id")
+  name        String? @map("nome")
+  measureType String? @map("tipo_medida") // temperatura, umidade, pressão, etc
+  measureUnit String? @map("unidade_medida") // oC, %, atm, etc
+  machineId   Int     @map("maquina_id")
+  machine     Machine @relation(fields: [machineId], references: [id])
+  events      Event[]
+
+  @@map("Sensores")
+}
+
+model Machine {
+  id      Int      @id @default(autoincrement()) @map("maquina_id")
+  name    String   @map("nome")
+  sensors Sensor[]
+
+  @@map("Maquinas")
+}

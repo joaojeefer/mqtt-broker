@@ -3,10 +3,10 @@ import { connect, MqttClient } from 'mqtt';
 
 @Injectable()
 export class MqttService {
-  public readonly mqtt: MqttClient;
+  public readonly mqttClient: MqttClient;
 
   constructor() {
-    this.mqtt = connect(process.env.connectUrl, {
+    this.mqttClient = connect(process.env.connectUrl, {
       clientId: process.env.clientId || null,
       clean: true,
       connectTimeout: parseInt(process.env.connectTimeout, 10),
@@ -15,15 +15,20 @@ export class MqttService {
       reconnectPeriod: parseInt(process.env.reconnectPeriod, 10),
     });
 
-    this.mqtt.on('connect', () => {
+    this.mqttClient.on('connect', () => {
       console.log('Connected to MQTT server');
     });
 
-    // this.mqtt.subscribe('/from-device', { qos: 1 });
+    this.mqttClient.on('error', () => {
+      console.error('Error in connecting to CloudMQTT');
+    });
 
-    // this.mqtt.on('message', function (topic, message) {
-    //   console.log('New message received!');
-    //   console.log(message.toString());
-    // });
+    this.mqttClient.subscribe('/from-device', { qos: 1 });
+
+    this.mqttClient.on('message', (topic, message) => {
+      // Descompatar a mensagem recebida.
+      console.log(`New message received from topic: ${topic}`);
+      console.log(message.toString());
+    });
   }
 }

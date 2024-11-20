@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { connect, MqttClient } from 'mqtt';
 
 import { BinaryUnpacker } from './binary-unpacker';
+import { MachineService } from 'src/machine/machine.service'; 
 
 @Injectable()
 export class MqttService {
   public readonly mqttClient: MqttClient;
   
-  constructor(private readonly unpacker: BinaryUnpacker) {
+  constructor(
+    private readonly unpacker: BinaryUnpacker,
+    private readonly machineService: MachineService
+  ) {
       this.mqttClient = connect(process.env.connectUrl, {
       //clientId: process.env.clientId || null,
       clean: true,
@@ -41,6 +45,8 @@ export class MqttService {
       const buffer = Buffer.from(message); // Converte a mensagem para buffer
       const unpackedData = this.unpacker.unpack(buffer); // Faz o unpack
       console.log('Mensagem descompactada:', unpackedData);
+
+      this.machineService.addSensorToMachine(unpackedData.machineId, unpackedData.sensorId);
           
     });
   }

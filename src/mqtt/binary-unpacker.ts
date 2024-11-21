@@ -16,7 +16,7 @@ export class BinaryUnpacker {
     second: { offset: 14, length: 1, type: 'uint8' },    // 8 bits (unsigned)
   };
 
-  /**
+   /**
    * Realiza o unpack de um buffer binário e retorna um objeto interpretado.
    * @param buffer Buffer contendo os dados binários.
    * @returns Objeto com os campos descompactados.

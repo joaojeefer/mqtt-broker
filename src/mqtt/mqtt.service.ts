@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { connect, MqttClient } from 'mqtt';
 
 import { BinaryUnpacker } from './binary-unpacker';
-import { MachineService } from 'src/machine/machine.service';
-import { SensorService } from 'src/sensor/sensor.service';
+import { EventService } from 'src/event/event.service';
 
 @Injectable()
 export class MqttService {
@@ -11,8 +10,7 @@ export class MqttService {
 
   constructor(
     private readonly unpacker: BinaryUnpacker,
-    private readonly machineService: MachineService,
-    private readonly sensorService: SensorService,
+    private readonly eventService: EventService,
   ) {
     this.mqttClient = connect(process.env.connectUrl, {
       //clientId: process.env.clientId || null,
@@ -24,41 +22,26 @@ export class MqttService {
     });
 
     this.mqttClient.on('connect', () => {
-      console.log('Connected to MQTT server');
+      console.log('Conectou ao servidor MQTT');
     });
 
     this.mqttClient.on('error', (error) => {
-      console.error('Error in connecting to CloudMQTT');
+      console.error('Falha ao conectar ao CloudMQTT');
       console.error(error);
     });
 
-    //this.mqttClient.subscribe('/from-device', { qos: 1 });
     this.mqttClient.subscribe('IoTSensors/Machines/#', { qos: 1 });
 
     this.mqttClient.on('message', (topic, message) => {
-      // Descompatar a mensagem recebida.
-      console.log(`New message received from topic: ${topic}\n`);
-      //console.log(message.toString());
+      console.log(`Nova mensagem recebida via tópico: ${topic}\n`);
 
-      console.log('--message size--');
-      console.log(message.length);
+      // Converte a mensagem para buffer
+      const buffer = Buffer.from(message);
 
-      const buffer = Buffer.from(message); // Converte a mensagem para buffer
-      const unpackedData = this.unpacker.unpack(buffer); // Faz o unpack
-      console.log('Mensagem descompactada:', unpackedData);
-      const float_value =
-        parseFloat(unpackedData.intValue) / unpackedData.conversionValue;
-      console.log('Valor reconstituído:', float_value);
+      // Faz o unpack da mensagem
+      const unpackedData = this.unpacker.unpack(buffer);
 
-      this.machineService.addSensorToMachine(
-        unpackedData.machineId,
-        unpackedData.sensorId,
-      );
-      this.sensorService.addEventToSensor(
-        unpackedData.sensorId,
-        float_value,
-        unpackedData.machineId,
-      );
+      this.eventService.logEvent(unpackedData);
     });
   }
 }

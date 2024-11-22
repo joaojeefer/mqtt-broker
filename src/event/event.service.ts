@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import CreateEventDto from './dto/create-event.dto';
 import { PrismaService } from 'src/db/prisma.service';
 import { Event } from '@prisma/client';
+import { MachineService } from 'src/machine/machine.service';
 
 @Injectable()
 export class EventService {
-  constructor(private dbService: PrismaService) {}
+  constructor(
+    private dbService: PrismaService,
+    private machineService: MachineService,
+  ) {}
 
   async create(data: CreateEventDto): Promise<{ eventId: number }> {
     const newEvent = await this.dbService.event.create({
@@ -25,6 +29,21 @@ export class EventService {
 
   async findOne(id: number): Promise<Event> {
     return this.dbService.event.findUnique({ where: { id } });
+  }
+
+  async logEvent(data: Record<string, any>) {
+    const value = parseFloat(data.intValue) / data.conversionValue;
+
+    const sensor = await this.machineService.addSensorToMachine(
+      data.sensorId,
+      data.machineId,
+    );
+
+    await this.create({
+      dateTime: new Date(data.timestamp),
+      sensorId: sensor.id,
+      value: value.toString(),
+    });
   }
 
   async remove(id: number): Promise<void> {

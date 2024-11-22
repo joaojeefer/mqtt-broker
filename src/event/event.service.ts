@@ -33,6 +33,7 @@ export class EventService {
 
   async logEvent(data: Record<string, any>) {
     const value = parseFloat(data.intValue) / data.conversionValue;
+    const dateTime = new Date(data.day, data.month, data.year, data.hour, data.minute, data.second);
 
     const sensor = await this.machineService.addSensorToMachine(
       data.sensorId,
@@ -40,7 +41,7 @@ export class EventService {
     );
 
     await this.create({
-      dateTime: new Date(data.timestamp),
+      dateTime: dateTime,
       sensorId: sensor.id,
       value: value.toString(),
     });

@@ -6,7 +6,13 @@ import { PrismaService } from '../db/prisma.service';
 import { SensorService } from 'src/sensor/sensor.service';
 
 @Module({
-  providers: [MqttService, BinaryUnpacker, MachineService, SensorService, PrismaService],
+  providers: [
+    MqttService,
+    BinaryUnpacker,
+    MachineService,
+    SensorService,
+    PrismaService,
+  ],
   exports: [MqttService],
 })
 export class MqttModule {}

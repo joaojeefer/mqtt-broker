@@ -53,7 +53,11 @@ export class SensorService {
     });
   }
 
-  async addEventToSensor(sensorId: number, eventId: number, machineId: number): Promise<Sensor> {
+  async addEventToSensor(
+    sensorId: number,
+    eventId: number,
+    machineId: number,
+  ): Promise<Sensor> {
     // return this.dbService.sensor.update({
     //   where: { id: sensorId },
     //   data: {
@@ -62,27 +66,25 @@ export class SensorService {
     //     },
     //   },
     // });
-    console.log("Sensor ID: ", sensorId, "Event ID: ", eventId);
+    console.log('Sensor ID: ', sensorId, 'Event ID: ', eventId);
     let sensor = await this.dbService.sensor.findUnique({
       where: { id: sensorId },
     });
 
     // Se a máquina não existir, insira-a no banco de dados
     if (!sensor) {
-      console.log("Maquina não existe")
+      console.log('Maquina não existe');
       sensor = await this.dbService.sensor.create({
         data: {
-          name: "Sensor " + sensorId,
-          measureType: "defaultType",
-          measureUnit: "defaultUnit",
+          name: 'Sensor ' + sensorId,
+          measureType: 'defaultType',
+          measureUnit: 'defaultUnit',
           machine: {
-            connect: { id: machineId }
-          }
+            connect: { id: machineId },
+          },
         },
       });
-    }
-    else
-      console.log("Sensor existe");
+    } else console.log('Sensor existe');
 
     // verifica se o sensor já existe e se não, insere-o
     // const event = await this.dbService.event.findUnique({
@@ -90,22 +92,21 @@ export class SensorService {
     // });
 
     // if (!event) {
-      //console.log("Sensor não existe");
-      // Adicione o sensor relacionado a máquina
-      await this.dbService.event.create({
-        data: {
-          // sensor: {
-          //   connect: { id: sensor.id },
-          // },
-          sensorId: sensor.id,
-          dateTime: new Date(),
-          value: eventId.toString(), 
-        },
-      });
+    //console.log("Sensor não existe");
+    // Adicione o sensor relacionado a máquina
+    await this.dbService.event.create({
+      data: {
+        // sensor: {
+        //   connect: { id: sensor.id },
+        // },
+        sensorId: sensor.id,
+        dateTime: new Date(),
+        value: eventId.toString(),
+      },
+    });
     //}
     // else
     //   console.log("Sensor existe");
     return;
-  } 
-  
+  }
 }

@@ -37,15 +37,13 @@ export class MachineService {
 
     // Se a máquina não existir, insira-a no banco de dados
     if (!machine) {
-      console.log("Maquina não existe")
+      console.log('Maquina não existe');
       machine = await this.dbService.machine.create({
         data: {
-          name: "Maquina "+ machineId, 
+          name: 'Maquina ' + machineId,
         },
       });
-    }
-    else
-      console.log("Máquina existe");
+    } else console.log('Máquina existe');
 
     // verifica se o sensor já existe e se não, insere-o
     const sensor = await this.dbService.sensor.findUnique({
@@ -53,19 +51,16 @@ export class MachineService {
     });
 
     if (!sensor) {
-      console.log("Sensor não existe");
+      console.log('Sensor não existe');
       // Adicione o sensor relacionado a máquina
       await this.dbService.sensor.create({
         data: {
           machineId: machine.id,
-          name: "Sensor "+ sensorId,
+          name: 'Sensor ' + sensorId,
         },
       });
-    }
-    else
-      console.log("Sensor existe");
+    } else console.log('Sensor existe');
 
-    
     // trocar para função na service de Sensor
     // const sensor = await this.dbService.sensor.findUnique({
     //   where: { id: sensorId },
@@ -74,7 +69,6 @@ export class MachineService {
     // if (!sensor) {
     //   throw new Error('Sensor not found');
     // }
-    
 
     // const machine = await this.dbService.machine.update({
     //   where: { id: machineId },

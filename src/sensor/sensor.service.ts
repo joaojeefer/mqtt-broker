@@ -85,25 +85,26 @@ export class SensorService {
       console.log("Sensor existe");
 
     // verifica se o sensor já existe e se não, insere-o
-    const event = await this.dbService.event.findUnique({
-      where: { id: sensorId },
-    });
+    // const event = await this.dbService.event.findUnique({
+    //   where: { id: sensorId },
+    // });
 
-    if (!event) {
-      console.log("Sensor não existe");
+    // if (!event) {
+      //console.log("Sensor não existe");
       // Adicione o sensor relacionado a máquina
       await this.dbService.event.create({
         data: {
-          sensor: {
-            connect: { id: sensor.id },
-          },
+          // sensor: {
+          //   connect: { id: sensor.id },
+          // },
+          sensorId: sensor.id,
           dateTime: new Date(),
-          value: 'teste', 
+          value: eventId.toString(), 
         },
       });
-    }
-    else
-      console.log("Sensor existe");
+    //}
+    // else
+    //   console.log("Sensor existe");
     return;
   } 
   

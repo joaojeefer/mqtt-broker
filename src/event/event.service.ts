@@ -44,8 +44,8 @@ export class EventService {
     );
 
     const sensor = await this.machineService.addSensorToMachine(
-      Number(data.sensorId),
       Number(data.machineId),
+      Number(data.sensorId),
     );
 
     await this.create({

@@ -23,7 +23,7 @@ export class BinaryUnpacker {
    */
   unpack(buffer: Buffer): Record<string, any> {
     if (!Buffer.isBuffer(buffer)) {
-      throw new Error('Input must be a Buffer');
+      throw new Error('Entrada deve ser um Buffer');
     }
 
     const result: Record<string, any> = {};
@@ -44,7 +44,7 @@ export class BinaryUnpacker {
           result[key] = buffer.readInt16BE(offset);
           break;
         default:
-          throw new Error(`Unsupported type: ${type}`);
+          throw new Error(`Tipo não suportado: ${type}`);
       }
     }
 

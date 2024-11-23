@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MqttService } from './mqtt.service';
 import { BinaryUnpacker } from './binary-unpacker';
-import { EventService } from 'src/event/event.service';
 import { DbModule } from 'src/db/db.module';
-import { MachineModule } from 'src/machine/machine.module';
+import { EventModule } from 'src/event/event.module';
 
 @Module({
-  imports: [DbModule, MachineModule],
-  providers: [MqttService, BinaryUnpacker, EventService],
+  imports: [DbModule, EventModule],
+  providers: [MqttService, BinaryUnpacker],
   exports: [MqttService],
 })
 export class MqttModule {}

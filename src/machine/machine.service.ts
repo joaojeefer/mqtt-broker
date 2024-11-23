@@ -43,8 +43,6 @@ export class MachineService {
     machineId: number,
     sensorId: number,
   ): Promise<Sensor> {
-    console.log(machineId, sensorId);
-
     const machine = await this.findOrCreateMachine(machineId);
 
     const sensor = await this.sensorService.findOrCreateSensor(

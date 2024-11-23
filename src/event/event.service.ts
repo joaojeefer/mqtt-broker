@@ -2,14 +2,10 @@ import { Injectable } from '@nestjs/common';
 import CreateEventDto from './dto/create-event.dto';
 import { PrismaService } from 'src/db/prisma.service';
 import { Event } from '@prisma/client';
-import { MachineService } from 'src/machine/machine.service';
 
 @Injectable()
 export class EventService {
-  constructor(
-    private dbService: PrismaService,
-    private machineService: MachineService,
-  ) {}
+  constructor(private dbService: PrismaService) {}
 
   async create(data: CreateEventDto): Promise<{ eventId: number }> {
     const newEvent = await this.dbService.event.create({
@@ -43,14 +39,9 @@ export class EventService {
       data.second,
     );
 
-    const sensor = await this.machineService.addSensorToMachine(
-      Number(data.machineId),
-      Number(data.sensorId),
-    );
-
     await this.create({
       dateTime,
-      sensorId: sensor.id,
+      sensorId: Number(data.sensorId),
       value: value.toString(),
     });
   }

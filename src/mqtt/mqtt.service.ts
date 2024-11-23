@@ -13,11 +13,8 @@ export class MqttService {
     private readonly eventService: EventService,
   ) {
     this.mqttClient = connect(process.env.connectUrl, {
-      //clientId: process.env.clientId || null,
       clean: true,
       connectTimeout: parseInt(process.env.connectTimeout, 10),
-      //username: process.env.username,
-      //password: process.env.password,
       reconnectPeriod: parseInt(process.env.reconnectPeriod, 10),
     });
 
@@ -41,6 +38,7 @@ export class MqttService {
       // Faz o unpack da mensagem
       const unpackedData = this.unpacker.unpack(buffer);
 
+      // Loga o evento
       this.eventService.logEvent(unpackedData);
     });
   }

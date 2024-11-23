@@ -1,20 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/db/prisma.service';
 import CreateMachineDto from './dto/create-machine.dto';
-import { Machine } from '@prisma/client';
+import { Machine, Sensor } from '@prisma/client';
+import { SensorService } from 'src/sensor/sensor.service';
 
 @Injectable()
 export class MachineService {
-  constructor(private dbService: PrismaService) {}
+  constructor(
+    private dbService: PrismaService,
+    private sensorService: SensorService,
+  ) {}
 
-  async create(data: CreateMachineDto): Promise<{ machineId: number }> {
+  async create(data: CreateMachineDto): Promise<Machine> {
     const newMachine = await this.dbService.machine.create({
       data: {
         name: data.name,
       },
     });
 
-    return { machineId: newMachine.id };
+    return newMachine;
   }
 
   async findAll(): Promise<Machine[]> {
@@ -25,31 +29,28 @@ export class MachineService {
     return this.dbService.machine.findUnique({ where: { id } });
   }
 
+  async findOrCreateMachine(machineId: number): Promise<Machine> {
+    let machine = await this.findOne(machineId);
+
+    if (!machine) {
+      machine = await this.create({ name: `Máquina ${machineId}` });
+    }
+
+    return machine;
+  }
+
   async addSensorToMachine(
     machineId: number,
     sensorId: number,
-  ): Promise<Machine> {
-    // trocar para função na service de Sensor
-    const sensor = await this.dbService.sensor.findUnique({
-      where: { id: sensorId },
-    });
+  ): Promise<Sensor> {
+    const machine = await this.findOrCreateMachine(machineId);
 
-    if (!sensor) {
-      throw new Error('Sensor not found');
-    }
+    const sensor = await this.sensorService.findOrCreateSensor(
+      sensorId,
+      machine.id,
+    );
 
-    const machine = await this.dbService.machine.update({
-      where: { id: machineId },
-      data: {
-        sensors: {
-          connect: {
-            id: sensorId,
-          },
-        },
-      },
-    });
-
-    return machine;
+    return sensor;
   }
 
   async remove(id: number): Promise<void> {

@@ -7,7 +7,7 @@ import { Sensor } from '@prisma/client';
 export class SensorService {
   constructor(private dbService: PrismaService) {}
 
-  async create(data: CreateSensorDto): Promise<{ sensorId: number }> {
+  async create(data: CreateSensorDto): Promise<Sensor> {
     const newSensor = await this.dbService.sensor.create({
       data: {
         name: data.name,
@@ -17,7 +17,7 @@ export class SensorService {
       },
     });
 
-    return { sensorId: newSensor.id };
+    return newSensor;
   }
 
   async findAll(): Promise<Sensor[]> {
@@ -28,6 +28,24 @@ export class SensorService {
     return this.dbService.sensor.findUnique({
       where: { id },
     });
+  }
+
+  async findOrCreateSensor(
+    sensorId: number,
+    machineId: number,
+  ): Promise<Sensor> {
+    let sensor = await this.findOne(sensorId);
+
+    if (!sensor) {
+      sensor = await this.create({
+        name: `Sensor ${sensorId}`,
+        measureType: 'defaultType',
+        measureUnit: 'defaultUnit',
+        machineId,
+      });
+    }
+
+    return sensor;
   }
 
   async remove(id: number): Promise<void> {

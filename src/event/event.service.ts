@@ -27,6 +27,25 @@ export class EventService {
     return this.dbService.event.findUnique({ where: { id } });
   }
 
+  async logEvent(data: Record<string, any>) {
+    const value = parseFloat(data.intValue) / data.conversionValue;
+
+    const dateTime = new Date(
+      data.year,
+      data.month - 1, // EM Javascript os meses começam em 0
+      data.day,
+      data.hour,
+      data.minute,
+      data.second,
+    );
+
+    await this.create({
+      dateTime,
+      sensorId: Number(data.sensorId),
+      value: value.toString(),
+    });
+  }
+
   async remove(id: number): Promise<void> {
     await this.dbService.event.delete({ where: { id } });
   }

@@ -36,7 +36,7 @@ export class EventService {
 
     const dateTime = new Date(
       data.year,
-      data.month,
+      data.month - 1, // EM Javascript os meses começam em 0
       data.day,
       data.hour,
       data.minute,
